@@ -250,7 +250,114 @@ main p {
   }
 }
 
+.form-container {
+  /* background-color: var(--hover-clr); */
+  padding: 2em;
+  /* border-radius: 1em; */
+  /* border: 1px solid var(--line-clr); */
+  max-width: 400px;
+  margin: auto;
+}
+
+.form-container h2 {
+  text-align: center;
+  margin-bottom: 1em;
+  color: var(--text-clr);
+}
+
+.form-group {
+  margin-bottom: 1.5em;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5em;
+  color: var(--secondary-text-clr);
+  font-weight: 500;
+}
+
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="password"],
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 0.75em;
+  border: 1px solid var(--line-clr);
+  border-radius: 0.5em;
+  background-color: var(--base-clr);
+  color: var(--text-clr);
+  font-size: 1rem;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--accent-clr);
+}
+
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding-bottom: 10px;
+}
+
+.checkbox-group input[type="checkbox"] {
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--line-clr);
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: var(--base-clr);
+}
+
+.checkbox-group input:checked {
+  background-color: var(--accent-clr);
+  border-color: var(--accent-clr);
+}
+
+.submit-btn {
+  display: block;
+  width: 100%;
+  padding: 0.75em;
+  background-color: var(--accent-clr);
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  border-radius: 0.5em;
+  cursor: pointer;
+  text-align: center;
+  transition: background 200ms ease;
+}
+
+.submit-btn:hover {
+  background-color: #4b50d1;
+}
+
+
+/* setting */
+
 .settingList {
   margin-top: 325px;
 }
 
+/* app buttons */
+
+.appButton{
+  position: relative;
+  height: 70px;
+  width: 70px;
+  border-radius: 20px;
+  top: 50px;
+  left: 19px;  
+}
+
+.appLabel{
+  position: relative;
+  top: 50px;
+  left: 5px;
+  color: var(--text-clr);
+}

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Startup Animation</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            color: white;
+            font-family: 'Arial', sans-serif;
+        }
+        .container {
+            text-align: center;
+            opacity: 0;
+            animation: fadeIn 3s forwards;
+        }
+        .logo {
+            width: 350px;
+            animation: logoZoom 3s ease forwards;
+        }
+        .text {
+            margin-top: 20px;
+            font-size: 24px;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            opacity: 0;
+            animation: textAppear 3s ease 1s forwards;
+        }
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+        @keyframes logoZoom {
+            0% {
+                transform: scale(0.7);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(2.2);
+                opacity: 1;
+            }
+        }
+        @keyframes textAppear {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="frontend/images/project-monolith-logo (copy 1).png" alt="Project Monolith Logo" class="logo">
+        <div class="text">PROJECT MONOLITH</div>
+    </div>
+</body>
+</html>
