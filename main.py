@@ -6,29 +6,37 @@ import os
 
 
 class API:
-   def portScan(self,ip,port,options):
-      cmd = ["nmap", ip]
-      if port:
-         cmd += ["-p", port]
-      if options:
-         cmd += options
-      
-      timestamp = datetime.datetime.now().strftime("%d-%m-%y-%H.%M")
-      filename = f"{ip}-{timestamp}.txt"
-      cmd_str = ' '.join(cmd) + f" > {filename}"
-      print(cmd_str)
-      #subprocess.run(['gnome-terminal', '--', 'bash', '-c', cmd_str]) 
-      scanprocess = subprocess.Popen(cmd_str, shell=True)
+    def portScan(self,ip,port,options):
+        cmd = ["nmap", ip]
+        if port:
+            cmd += ["-p", port]
+        if options:
+            cmd += options
+        
+        timestamp = datetime.datetime.now().strftime("%d-%m-%y-%H.%M")
+        filename = f"{ip}-{timestamp}.txt"
+        cmd_str = ' '.join(cmd) + f" > {filename}"
+        print(cmd_str)
+        #subprocess.run(['gnome-terminal', '--', 'bash', '-c', cmd_str]) 
+        scanprocess = subprocess.Popen(cmd_str, shell=True)
 
-      scanprocess.wait()
-      
-      if os.path.exists(filename):
-         print(f"scan for {ip} is completed") 
+        scanprocess.wait()
+        
+        if os.path.exists(filename):
+            print(f"scan for {ip} is completed") 
+            
+            with open(filename, 'r') as file:
+                scan_result = file.read()
+    # output of scan result code starts here
+                self.result("Nmap", scan_result)
+
+    # output result for the scan html code ends here
+        else:
+            print("scan failed")
          
-         with open(filename, 'r') as file:
-            scan_result = file.read()
-# output of scan result code starts here
-            webview.create_window("Port Scan Result", html=f"""
+    
+    def result(self,tool,results):
+        webview.create_window("Port Scan Result", html=f"""
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -84,7 +92,7 @@ class API:
 <body>
     <h1>Port Scan Result</h1>
     <div class="container">
-        <pre>{scan_result}</pre>
+        <pre>{results}</pre>
     </div>
     <div class="footer">
         <p>Scan completed at {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
@@ -92,12 +100,6 @@ class API:
 </body>
 </html>
 """, height=700, width=1000)
-
-# output result for the scan html code ends here
-            
-        
-      else:
-         print("scan failed")
          
    
       
