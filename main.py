@@ -6,6 +6,10 @@ import os
 
 
 class API:
+
+    
+# NMAP PORT SCAN STARTS HERE    
+
     def portScan(self,ip,port,options):
         cmd = ["nmap", ip]
         if port:
@@ -15,11 +19,11 @@ class API:
         
         timestamp = datetime.datetime.now().strftime("%d-%m-%y-%H.%M")
         filename = f"{ip}-{timestamp}.txt"
+        
         cmd_str = ' '.join(cmd) + f" > {filename}"
         print(cmd_str)
-        #subprocess.run(['gnome-terminal', '--', 'bash', '-c', cmd_str]) 
+        
         scanprocess = subprocess.Popen(cmd_str, shell=True)
-
         scanprocess.wait()
         
         if os.path.exists(filename):
@@ -27,22 +31,57 @@ class API:
             
             with open(filename, 'r') as file:
                 scan_result = file.read()
-    # output of scan result code starts here
                 self.result("Nmap", scan_result)
-
-    # output result for the scan html code ends here
         else:
             print("scan failed")
          
+# NMAP PORT SCAN ENDS HERE
+
+# DNS ENUMERATION CODE STARTS HERE
+    def dnsEnum(self,domain,options):
+        cmd = ["amass enum -d", domain]
+
+        if options:
+            cmd += options
+            
+        
+        timestamp = datetime.datetime.now().strftime("%d-%m-%y-%H.%M")
+        filename = f"{domain}-{timestamp}.txt"
+        
+        cmd_str = ' '.join(cmd) + f" > {filename}"
+        print(cmd_str)
+        
+        scanprocess = subprocess.Popen(cmd_str, shell=True)
+        scanprocess.wait()
+        
+        if os.path.exists(filename):
+            print(f"scan for {domain} is completed") 
+            
+            with open(filename, 'r') as file:
+                scan_result = file.read()
+                self.result("Amass", scan_result)
+        else:
+            print("scan failed") 
+# DNS ENUMERATION CODE ENDS HERE
+
+
+# RESULT WINDOW POPUP CODE STARTS HERE
     
     def result(self,tool,results):
-        webview.create_window("Port Scan Result", html=f"""
+        
+        if tool == "Nmap":
+            tool = "port scan"
+        elif tool == "amass":
+            tool = "subdomain enumeration"
+        else:
+            pass
+        webview.create_window(tool, html=f"""
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Port Scan Result</title>
+    <title><pre>{tool}</pre></title>
     <style>
         body {{
             font-family: Arial, sans-serif;
@@ -90,7 +129,7 @@ class API:
     </style>
 </head>
 <body>
-    <h1>Port Scan Result</h1>
+    <h1>{tool}</h1>
     <div class="container">
         <pre>{results}</pre>
     </div>
@@ -99,9 +138,9 @@ class API:
     </div>
 </body>
 </html>
-""", height=700, width=1000)
+""", height=700, width=1000)    
          
-   
+# RESULT WINDOW POPUP CODE ENDS HERE
       
       
          
@@ -111,6 +150,6 @@ if __name__ == '__main__':
    window = webview.create_window('Project MONOLITH', 'frontend/web-pen.html', js_api=api,
                               width=1200,
                               height=710,
-                              resizable= False
-                            )
+                              resizable= False,
+ )
    webview.start(debug=False)

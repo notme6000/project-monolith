@@ -82,7 +82,7 @@
     <p></p>
     <hr>
     <div class="form-container">
-      <h2>port scanner</h2>
+      <h2></h2>
       <form onsubmit="submitForm(event)">
         <div class="form-group">
           <label for="portIP">IP/Domain-name</label>
@@ -102,7 +102,23 @@
           <input type="checkbox" id="option2" name="option2" value="-sS">
           <label for="remember">Stealth scan</label>
         </div>
-
+        <div class="checkbox-group">
+          <input type="checkbox" id="option3" name="option3" value="-O">
+          <label for="remember">OS Detection</label>
+        </div>
+        <div class="checkbox-group">
+          <input type="checkbox" id="option4" name="option4" value="-sV">
+          <label for="remember">Service Detection</label>
+        </div>
+        <div class="checkbox-group">
+          <input type="checkbox" id="option5" name="option5" value="--open">
+          <label for="remember">Open Ports Only</label>
+        </div>
+        <div class="checkbox-group">
+          <input type="checkbox" id="option6" name="option6" value="-sO">
+          <label for="remember">IP Protocol Scan</label>
+        </div>
+        
         <button type="submit" class="submit-btn">Scan</button>
 
       </form>
@@ -127,6 +143,18 @@
     }
     if (document.getElementById("option2").checked) {
       options.push(document.getElementById("option2").value);
+    }
+    if (document.getElementById("option3").checked) {
+      options.push(document.getElementById("option3").value);
+    }
+    if (document.getElementById("option4").checked) {
+      options.push(document.getElementById("option4").value);
+    }
+    if (document.getElementById("option5").checked) {
+      options.push(document.getElementById("option5").value);
+    }
+    if (document.getElementById("option6").checked) {
+      options.push(document.getElementById("option6").value);
     }
 
     if (!port) {

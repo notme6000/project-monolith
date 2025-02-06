@@ -346,34 +346,47 @@ main p {
 
 /* app buttons */
 
-.appButton1{
-  position: relative;
-  height: 70px;
-  width: 70px;
-  border-radius: 20px;
-  top: 50px;
-  left: 19px;  
+.app-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 50px;
+  justify-items: center;
+  padding: 10px;
 }
 
-.appButton2{
-  position: relative;
-  height: 70px;
-  width: 70px;
-  border-radius: 20px;
-  bottom: 72px;
-  left: 159px;  
-}
-
-.appLabel1{
-  position: relative;
-  top: 50px;
-  left: 5px;
+.app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* Ensures the icon and label are centered */
+  justify-content: center;
+  /* Align items vertically */
+  gap: 8px;
+  /* Adds spacing between the icon and label */
+  text-decoration: none;
   color: var(--text-clr);
+  transition: transform 0.2s ease-in-out;
 }
 
-.appLabel2{
-  position: relative;
-  top: 50px;
-  left: 100px;
+.app:hover {
+  transform: scale(1.1);
+}
+
+.app img {
+  width: 64px;
+  height: 64px;
+  border-radius: 15px;
+  object-fit: cover;
+  /* Ensures the image fills its dimensions */
+}
+
+.app-label {
+  margin: 0;
+  /* Removes extra margin that might cause misalignment */
+  font-size: 14px;
+  /* Ensures consistent text size */
+  text-align: center;
+  /* Centers the label text */
   color: var(--text-clr);
+  /* Inherits the color variable */
 }
