@@ -63,7 +63,41 @@ class API:
         else:
             print("scan failed") 
 # DNS ENUMERATION CODE ENDS HERE
+    def dnsRecon(self,domain):
+        cmd = ["whois", domain]
+        
+        timestamp = datetime.datetime.now().strftime("%d-%m-%y-%H.%M")
+        filename = f"{domain}-{timestamp}.txt"
+        
+        cmd_str = ' '.join(cmd) + f" > {filename}"
+        print(cmd_str)
+        
+        scanprocess = subprocess.Popen(cmd_str, shell=True)
+        scanprocess.wait()
+        
+        if os.path.exists(filename):
+            print(f"scan for {domain} is completed") 
+            
+            target_phrase = "DNSSEC"  # Change this to the phrase where deletion starts
 
+            with open(filename, "r") as file:
+                lines = file.readlines()
+
+            # Find the index where the target phrase appears
+            for i, line in enumerate(lines):
+                if target_phrase in line:
+                    lines = lines[:i]  # Keep only lines before the phrase
+                    break  # Stop scanning once found
+
+            with open(filename, "w") as file:
+                file.writelines(lines)
+            
+            with open(filename, 'r') as file:
+                scan_result = file.read()
+                self.result("Amass", scan_result)
+        else:
+            print("scan failed") 
+        
 
 # RESULT WINDOW POPUP CODE STARTS HERE
     
