@@ -3,6 +3,7 @@ import subprocess
 import datetime
 import time
 import os
+from openai import OpenAI
 
 
 class API:
@@ -29,9 +30,11 @@ class API:
         if os.path.exists(filename):
             print(f"scan for {ip} is completed") 
             
-            with open(filename, 'r') as file:
-                scan_result = file.read()
-                self.result("Nmap", scan_result)
+            self.save_file_ai(filename,"nmap")
+            
+            # with open(filename, 'r') as file:
+            #     scan_result = file.read()
+            #     self.result("Nmap", scan_result)
         else:
             print("scan failed")
          
@@ -92,12 +95,49 @@ class API:
             with open(filename, "w") as file:
                 file.writelines(lines)
             
-            with open(filename, 'r') as file:
-                scan_result = file.read()
-                self.result("Amass", scan_result)
+            self.save_file_ai(filename,"whois")
+            # with open(filename, 'r') as file:
+            #     scan_result = file.read()
+            #     self.result("whois", scan_result)
         else:
             print("scan failed") 
+
+# SAVE FILE CODE STARTS HERE
+
+    def save_file_ai(self, filename,tool):
+        with open(filename, 'r') as file:
+            scan_result = file.read()
         
+        client = OpenAI(
+        base_url="https://openrouter.ai/api/v1",
+        api_key="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",
+        )
+
+        completion = client.chat.completions.create(
+        extra_headers={
+            "HTTP-Referer": "<YOUR_SITE_URL>", # Optional. Site URL for rankings on openrouter.ai.
+            "X-Title": "<YOUR_SITE_NAME>", # Optional. Site title for rankings on openrouter.ai.
+        },
+        extra_body={},
+        model="qwen/qwen-vl-plus:free",
+        messages=[
+            {
+            "role": "user",
+            "content": scan_result + "read the output and summarize it and provide a report in a structured format"
+            
+            }
+        ]
+        )
+        print("ai response",completion)
+        ai_response = completion.choices[0].message.content
+
+        with open(filename, "w") as file:
+            file.write(ai_response)
+            
+        self.result(tool, ai_response)
+        
+                
+# SAVE FILE CODE ENDS HERE
 
 # RESULT WINDOW POPUP CODE STARTS HERE
     
@@ -107,6 +147,8 @@ class API:
             tool = "port scan"
         elif tool == "amass":
             tool = "subdomain enumeration"
+        elif tool == "whois":
+            tool = "DNS recon"
         else:
             pass
         webview.create_window(tool, html=f"""
@@ -159,25 +201,28 @@ class API:
             margin-top: 20px;
             font-size: 12px;
             color: #999;
-        }}
-    </style>
-</head>
-<body>
-    <h1>{tool}</h1>
-    <div class="container">
-        <pre>{results}</pre>
-    </div>
-    <div class="footer">
-        <p>Scan completed at {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
-    </div>
-</body>
-</html>
-""", height=700, width=1000)    
+                }}
+            </style>
+        </head>
+        <body>
+            <h1>{tool}</h1>
+            <div class="container">
+                <pre>{results}</pre>
+            </div>
+            <div class="footer">
+                <p>Scan completed at {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
+            </div>
+        </body>
+        </html>
+        """, height=700, width=1000)    
          
 # RESULT WINDOW POPUP CODE ENDS HERE
+
+# SAVE FILE CODE STARTS HERE
+   
       
-      
-         
+# SAVE FILE CODE ENDS HERE
+
 
 if __name__ == '__main__':
    api = API()
@@ -185,5 +230,6 @@ if __name__ == '__main__':
                               width=1200,
                               height=710,
                               resizable= False,
+                              
  )
    webview.start(debug=False)
