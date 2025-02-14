@@ -9,8 +9,7 @@ from openai import OpenAI
 class API:
 
     
-# NMAP PORT SCAN STARTS HERE    
-
+#NMAP PORT SCAN STARTS HERE    
     def portScan(self,ip,port,options):
         cmd = ["nmap", ip]
         if port:
@@ -18,29 +17,28 @@ class API:
         if options:
             cmd += options
         
-        timestamp = datetime.datetime.now().strftime("%d-%m-%y-%H.%M")
+        timestamp = datetime.datetime.now().strftime("%d-%m-%y-%H.%M.%S")
         filename = f"{ip}-{timestamp}.txt"
         
         cmd_str = ' '.join(cmd) + f" > {filename}"
         print(cmd_str)
         
-        scanprocess = subprocess.Popen(cmd_str, shell=True)
-        scanprocess.wait()
+        self.scanprocess = subprocess.Popen(cmd_str, shell=True)
+        self.scanprocess.wait()
         
         if os.path.exists(filename):
             print(f"scan for {ip} is completed") 
             
-            self.save_file_ai(filename,"nmap")
+            # self.save_file_ai(filename,"nmap")
             
-            # with open(filename, 'r') as file:
-            #     scan_result = file.read()
-            #     self.result("Nmap", scan_result)
+            with open(filename, 'r') as file:
+                scan_result = file.read()
+                self.result("Nmap", scan_result)
         else:
             print("scan failed")
-         
-# NMAP PORT SCAN ENDS HERE
+#NMAP PORT SCAN ENDS HERE
 
-# DNS ENUMERATION CODE STARTS HERE
+#DNS ENUMERATION CODE STARTS HERE
     def dnsEnum(self,domain,options):
         cmd = ["amass enum -d", domain]
 
@@ -48,7 +46,7 @@ class API:
             cmd += options
             
         
-        timestamp = datetime.datetime.now().strftime("%d-%m-%y-%H.%M")
+        timestamp = datetime.datetime.now().strftime("%d-%m-%y-%H.%M.%S")
         filename = f"{domain}-{timestamp}.txt"
         
         cmd_str = ' '.join(cmd) + f" > {filename}"
@@ -65,11 +63,13 @@ class API:
                 self.result("Amass", scan_result)
         else:
             print("scan failed") 
-# DNS ENUMERATION CODE ENDS HERE
+#DNS ENUMERATION CODE ENDS HERE
+
+#DNS RECON CODE STARTS HERE
     def dnsRecon(self,domain):
         cmd = ["whois", domain]
         
-        timestamp = datetime.datetime.now().strftime("%d-%m-%y-%H.%M")
+        timestamp = datetime.datetime.now().strftime("%d-%m-%y-%H.%M.%S")
         filename = f"{domain}-{timestamp}.txt"
         
         cmd_str = ' '.join(cmd) + f" > {filename}"
@@ -95,15 +95,15 @@ class API:
             with open(filename, "w") as file:
                 file.writelines(lines)
             
-            self.save_file_ai(filename,"whois")
-            # with open(filename, 'r') as file:
-            #     scan_result = file.read()
-            #     self.result("whois", scan_result)
+            # self.save_file_ai(filename,"whois")
+            with open(filename, 'r') as file:
+                scan_result = file.read()
+                self.result("whois", scan_result)
         else:
             print("scan failed") 
+#DNS RECON CODE ENDS HERE
 
-# SAVE FILE CODE STARTS HERE
-
+#SAVE FILE CODE STARTS HERE
     def save_file_ai(self, filename,tool):
         with open(filename, 'r') as file:
             scan_result = file.read()
@@ -135,12 +135,38 @@ class API:
             file.write(ai_response)
             
         self.result(tool, ai_response)
-        
-                
 # SAVE FILE CODE ENDS HERE
 
+#WEB-VULN SCAN CODE STARTS HERE
+    def webvuln(self,domain,options):
+        cmd = ["nikto -h", domain]
+        
+        if options:
+            cmd += options
+        
+        timestamp = datetime.datetime.now().strftime("%d-%m-%y-%H.%M")
+        sanitized_domain = domain.replace("https://", "_").replace("http://", "_").replace("/", "_")
+        filename = f"{sanitized_domain}-{timestamp}.txt"
+        
+        cmd_str = ' '.join(cmd) + f" > {filename}"
+        print(cmd_str)
+        
+        self.scanprocess = subprocess.Popen(cmd_str, shell=True)
+        self.scanprocess.wait()
+        
+        if os.path.exists(filename):
+            print(f"scan for {domain} is completed") 
+            
+            # self.save_file_ai(filename,"nmap")
+            
+            with open(filename, 'r') as file:
+                scan_result = file.read()
+                self.result("nikto", scan_result)
+        else:
+            print("scan failed")
+#WEB-VULN SCAN CODE ENDS HERE
+
 # RESULT WINDOW POPUP CODE STARTS HERE
-    
     def result(self,tool,results):
         
         if tool == "Nmap":
@@ -149,6 +175,8 @@ class API:
             tool = "subdomain enumeration"
         elif tool == "whois":
             tool = "DNS recon"
+        elif tool == "nikto":
+            tool = "web vuln scan"
         else:
             pass
         webview.create_window(tool, html=f"""
@@ -215,8 +243,11 @@ class API:
         </body>
         </html>
         """, height=700, width=1000)    
-         
 # RESULT WINDOW POPUP CODE ENDS HERE
+    def terminate_scan(self):
+        self.scanprocess.terminate()
+        print("terminated")
+
 
 # SAVE FILE CODE STARTS HERE
    

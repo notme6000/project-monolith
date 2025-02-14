@@ -78,7 +78,7 @@
     </ul>
   </nav>
   <main>
-    <h1 style="text-align: center;">Port Scanning</h1>
+    <h1 style="text-align: center;">Web Vulnerability Scanner</h1>
     <p></p>
     <hr>
     <div class="form-container">
@@ -89,38 +89,41 @@
           <input type="text" id="portIP" name="portIP" required>
         </div>
 
-        <div class="form-group">
-          <label for="portnumber">Port number</label>
-          <input type="text" id="portnumber" name="portnumber">
+        <div class="checkbox-group">
+          <input type="checkbox" id="option1" name="option1" value="-ssl">
+          <label for="remember">ssl</label>
         </div>
 
         <div class="checkbox-group">
-          <input type="checkbox" id="option1" name="option1" value="-sU">
-          <label for="remember">UDP Scan</label>
+          <input type="checkbox" id="option2" name="option2" value="-nossl">
+          <label for="remember">No ssl</label>
         </div>
+
         <div class="checkbox-group">
-          <input type="checkbox" id="option2" name="option2" value="-sS">
-          <label for="remember">Stealth scan</label>
+          <input type="checkbox" id="option3" name="option3" value="-ipv4">
+          <label for="remember">ipv4</label>
         </div>
+
         <div class="checkbox-group">
-          <input type="checkbox" id="option3" name="option3" value="-O">
-          <label for="remember">OS Detection</label>
+          <input type="checkbox" id="option4" name="option4" value="-ipv6">
+          <label for="remember">ipv6</label>
         </div>
+
         <div class="checkbox-group">
-          <input type="checkbox" id="option4" name="option4" value="-sV">
-          <label for="remember">Service Detection</label>
+          <input type="checkbox" id="option5" name="option5" value="-Tuning 4">
+          <label for="remember">Injection (XSS/Script/HTML)</label>
         </div>
+
         <div class="checkbox-group">
-          <input type="checkbox" id="option5" name="option5" value="--open">
-          <label for="remember">Open Ports Only</label>
+          <input type="checkbox" id="option6" name="option6" value="-Tuning 9">
+          <label for="remember">SQL Injection</label>
         </div>
-        <div class="checkbox-group">
-          <input type="checkbox" id="option6" name="option6" value="-sO">
-          <label for="remember">IP Protocol Scan</label>
-        </div>
+
+        
         
         <button type="submit" class="submit-btn">Scan</button>
 
+        <button id="terminate-scan" class="submit-btn" style="margin-top: 10px;">Terminate Scan</button>
       </form>
     </div>
 
@@ -128,14 +131,17 @@
 </body>
 <script>
 
+  document.getElementById("terminate-scan").addEventListener("click", function() {
+      window.pywebview.api.terminate_scan();
+  });
   
 
   function submitForm(event) {
     event.preventDefault();
     alert("Form submitted successfully!");
 
-    let ip = document.getElementById("portIP").value;
-    let port = document.getElementById("portnumber").value;
+    let domain = document.getElementById("portIP").value;
+    // let port = document.getElementById("portnumber").value;
 
     let options = [];
     if (document.getElementById("option1").checked) {
@@ -157,11 +163,11 @@
       options.push(document.getElementById("option6").value);
     }
 
-    if (!port) {
-      port = "1-65535";  // default port range for full scan
-    }
+    // if (!port) {
+    //   port = "1-65535";  // default port range for full scan
+    // }
 
-    window.pywebview.api.portScan(ip, port, options).then(response => {
+    window.pywebview.api.webvuln(domain, options).then(response => {
 
     });
   }
