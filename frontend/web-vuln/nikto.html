@@ -89,42 +89,9 @@
           <input type="text" id="portIP" name="portIP" required>
         </div>
 
-        <div class="checkbox-group">
-          <input type="checkbox" id="option1" name="option1" value="-ssl">
-          <label for="remember">ssl</label>
-        </div>
-
-        <div class="checkbox-group">
-          <input type="checkbox" id="option2" name="option2" value="-nossl">
-          <label for="remember">No ssl</label>
-        </div>
-
-        <div class="checkbox-group">
-          <input type="checkbox" id="option3" name="option3" value="-ipv4">
-          <label for="remember">ipv4</label>
-        </div>
-
-        <div class="checkbox-group">
-          <input type="checkbox" id="option4" name="option4" value="-ipv6">
-          <label for="remember">ipv6</label>
-        </div>
-
-        <div class="checkbox-group">
-          <input type="checkbox" id="option5" name="option5" value="-Tuning 4">
-          <label for="remember">Injection (XSS/Script/HTML)</label>
-        </div>
-
-        <div class="checkbox-group">
-          <input type="checkbox" id="option6" name="option6" value="-Tuning 9">
-          <label for="remember">SQL Injection</label>
-        </div>
-
-        
-        
         <button type="submit" class="submit-btn">Scan</button>
-
-        <button id="terminate-scan" class="submit-btn" style="margin-top: 10px;">Terminate Scan</button>
       </form>
+      <button id="terminate-scan" class="submit-btn" style="margin-top: 10px;">Terminate Scan</button>
     </div>
 
   </main>
@@ -143,31 +110,31 @@
     let domain = document.getElementById("portIP").value;
     // let port = document.getElementById("portnumber").value;
 
-    let options = [];
-    if (document.getElementById("option1").checked) {
-      options.push(document.getElementById("option1").value);
-    }
-    if (document.getElementById("option2").checked) {
-      options.push(document.getElementById("option2").value);
-    }
-    if (document.getElementById("option3").checked) {
-      options.push(document.getElementById("option3").value);
-    }
-    if (document.getElementById("option4").checked) {
-      options.push(document.getElementById("option4").value);
-    }
-    if (document.getElementById("option5").checked) {
-      options.push(document.getElementById("option5").value);
-    }
-    if (document.getElementById("option6").checked) {
-      options.push(document.getElementById("option6").value);
-    }
+    // let options = [];
+    // if (document.getElementById("option1").checked) {
+    //   options.push(document.getElementById("option1").value);
+    // }
+    // if (document.getElementById("option2").checked) {
+    //   options.push(document.getElementById("option2").value);
+    // }
+    // if (document.getElementById("option3").checked) {
+    //   options.push(document.getElementById("option3").value);
+    // }
+    // if (document.getElementById("option4").checked) {
+    //   options.push(document.getElementById("option4").value);
+    // }
+    // if (document.getElementById("option5").checked) {
+    //   options.push(document.getElementById("option5").value);
+    // }
+    // if (document.getElementById("option6").checked) {
+    //   options.push(document.getElementById("option6").value);
+    // }
 
     // if (!port) {
     //   port = "1-65535";  // default port range for full scan
     // }
 
-    window.pywebview.api.webvuln(domain, options).then(response => {
+    window.pywebview.api.webvuln(domain).then(response => {
 
     });
   }

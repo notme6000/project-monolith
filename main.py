@@ -3,6 +3,7 @@ import subprocess
 import datetime
 import time
 import os
+from threading import Thread
 from openai import OpenAI
 
 
@@ -11,6 +12,9 @@ class API:
     
 #NMAP PORT SCAN STARTS HERE    
     def portScan(self,ip,port,options):
+        
+        self.show_loader()
+        
         cmd = ["nmap", ip]
         if port:
             cmd += ["-p", port]
@@ -18,13 +22,15 @@ class API:
             cmd += options
         
         timestamp = datetime.datetime.now().strftime("%d-%m-%y-%H.%M.%S")
-        filename = f"{ip}-{timestamp}.txt"
+        filename = f"portscan-{ip}-{timestamp}.txt"
         
         cmd_str = ' '.join(cmd) + f" > {filename}"
         print(cmd_str)
         
         self.scanprocess = subprocess.Popen(cmd_str, shell=True)
         self.scanprocess.wait()
+        
+        self.close_loader()
         
         if os.path.exists(filename):
             print(f"scan for {ip} is completed") 
@@ -47,7 +53,7 @@ class API:
             
         
         timestamp = datetime.datetime.now().strftime("%d-%m-%y-%H.%M.%S")
-        filename = f"{domain}-{timestamp}.txt"
+        filename = f"dnsenum-{domain}-{timestamp}.txt"
         
         cmd_str = ' '.join(cmd) + f" > {filename}"
         print(cmd_str)
@@ -110,7 +116,7 @@ class API:
         
         client = OpenAI(
         base_url="https://openrouter.ai/api/v1",
-        api_key="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",
+        api_key="",
         )
 
         completion = client.chat.completions.create(
@@ -138,33 +144,114 @@ class API:
 # SAVE FILE CODE ENDS HERE
 
 #WEB-VULN SCAN CODE STARTS HERE
-    def webvuln(self,domain,options):
-        cmd = ["nikto -h", domain]
+    def webvuln(self, domain):
+        # Construct the Nmap command
+        cmd = ["nmap", "-sV", "--script=vuln", domain]
         
-        if options:
-            cmd += options
-        
-        timestamp = datetime.datetime.now().strftime("%d-%m-%y-%H.%M")
-        sanitized_domain = domain.replace("https://", "_").replace("http://", "_").replace("/", "_")
+        # Generate timestamped filename
+        timestamp = datetime.datetime.now().strftime("%d-%m-%y-%H.%M.%S")
+        sanitized_domain = domain.replace("https://", "_").replace("http://", "_").replace("/", "_").replace(":", "_")
         filename = f"{sanitized_domain}-{timestamp}.txt"
         
-        cmd_str = ' '.join(cmd) + f" > {filename}"
-        print(cmd_str)
-        
-        self.scanprocess = subprocess.Popen(cmd_str, shell=True)
-        self.scanprocess.wait()
-        
-        if os.path.exists(filename):
-            print(f"scan for {domain} is completed") 
+        # Execute the command and write output to a file
+        try:
+            with open(filename, 'w') as file:
+                self.scanprocess = subprocess.Popen(cmd, stdout=file, stderr=subprocess.PIPE)
+                self.scanprocess.wait()
             
-            # self.save_file_ai(filename,"nmap")
-            
-            with open(filename, 'r') as file:
-                scan_result = file.read()
-                self.result("nikto", scan_result)
-        else:
-            print("scan failed")
+            # Check if the file exists and is not empty
+            if os.path.exists(filename) and os.path.getsize(filename) > 0:
+                print(f"Scan for {domain} is completed. Results saved in {filename}.")
+                
+                # Optionally read the results for further processing
+                with open(filename, 'r') as file:
+                    scan_result = file.read()
+                    self.result("nmap", scan_result)  # Adjust the second argument as needed
+            else:
+                print("Scan failed or produced no output.")
+        except Exception as e:
+            print(f"An error occurred: {e}")
 #WEB-VULN SCAN CODE ENDS HERE
+
+#LOADER CODE STARTS HERE
+    def show_loader(self):
+        # Display a loader screen in a separate thread
+        def loader():
+            self.loader_window = webview.create_window(
+                "Loading...",
+                html="""
+                <!DOCTYPE html>
+                <html lang="en">
+
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Loading...</title>
+                    <style>
+                        /* Overall page styles */
+                        body {
+                            font-family: Arial, sans-serif;
+                            display: flex;
+                            flex-direction: column;
+                            justify-content: center;
+                            align-items: center;
+                            height: 100vh;
+                            margin: 0;
+                            background-color: #1e1e1e;
+                            color: #ffffff;
+                        }
+
+                        /* Loader animation */
+                        .loader {
+                            border: 10px solid #f3f3f3; /* Light gray border */
+                            border-top: 10px solid #3498db; /* Blue border on top */
+                            border-radius: 50%;
+                            width: 100px;
+                            height: 100px;
+                            animation: spin 1s linear infinite; /* Smooth spinning */
+                        }
+
+                        /* Spinning animation */
+                        @keyframes spin {
+                            0% {
+                                transform: rotate(0deg);
+                            }
+                            100% {
+                                transform: rotate(360deg);
+                            }
+                        }
+
+                        /* Text below the loader */
+                        .scan-text {
+                            margin-top: 20px;
+                            font-size: 20px;
+                            font-weight: bold;
+                            text-align: center;
+                        }
+                    </style>
+                </head>
+
+                <body>
+                    <div class="loader"></div>
+                    <p class="scan-text">Scanning in progress...</p>
+                </body>
+
+                </html>
+
+                """,
+                width=400,
+                height=300,
+                resizable=False,
+            )
+            webview.start(debug=False)
+
+        Thread(target=loader, daemon=True).start()
+
+    def close_loader(self):
+        if self.loader_window:
+            self.loader_window.destroy()
+            self.loader_window = None
+#LOADER CODE ENDS HERE
 
 # RESULT WINDOW POPUP CODE STARTS HERE
     def result(self,tool,results):

@@ -91,8 +91,8 @@
                     <label for="portIP">IP/Domain-name</label>
                     <input type="text" id="portIP" name="portIP" required>
                 </div>
-                
-                
+
+
                 <div class="checkbox-group">
                     <input type="checkbox" id="option1" name="option1" value="-active">
                     <label for="remember">Active Scan</label>
@@ -105,12 +105,15 @@
                 <button type="submit" class="submit-btn">Scan</button>
 
             </form>
+            <button id="terminate-scan" class="submit-btn" style="margin-top: 10px;">Terminate Scan</button>
         </div>
 
     </main>
 </body>
 <script>
-
+    document.getElementById("terminate-scan").addEventListener("click", function () {
+        window.pywebview.api.terminate_scan();
+    });
 
 
     function submitForm(event) {
