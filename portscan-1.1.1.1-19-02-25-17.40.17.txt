@@ -1,0 +1,23 @@
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-02-19 17:40 IST
+Nmap scan report for one.one.one.one (1.1.1.1)
+Host is up (0.024s latency).
+
+PORT   STATE    SERVICE
+1/tcp  filtered tcpmux
+2/tcp  filtered compressnet
+3/tcp  filtered compressnet
+4/tcp  filtered unknown
+5/tcp  filtered rje
+6/tcp  filtered unknown
+7/tcp  filtered echo
+8/tcp  filtered unknown
+9/tcp  filtered discard
+10/tcp filtered unknown
+Warning: OSScan results may be unreliable because we could not find at least 1 open and 1 closed port
+Device type: VoIP adapter|general purpose
+Running: Avaya embedded, IBM OS/400 V4, Linux 2.6.X|4.X
+OS CPE: cpe:/o:ibm:os_400:v4r3 cpe:/o:linux:linux_kernel:2.6.24 cpe:/o:linux:linux_kernel:4.4
+OS details: Avaya G350 Media Gateway VoIP adapter, IBM OS/400 V4R3, Linux 2.6.24, Linux 4.4
+
+OS detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 3.96 seconds

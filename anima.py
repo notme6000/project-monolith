@@ -10,7 +10,7 @@ def load_main_page(window):
 # Create the main function
 def main():
     # Create a PyWebView window for the startup animation
-    window = webview.create_window("Project Monolith", "frontend/anima.html", width=1200, height=710, resizable=False)
+    window = webview.create_window("Project Monolith", "frontend/anima.html", width=1200, height=710, resizable=False,js_api=api)
     
     # Start a separate thread to load the main page after a delay
     threading.Thread(target=load_main_page, args=(window,)).start()

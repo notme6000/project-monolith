@@ -1,0 +1,17 @@
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-02-19 17:39 IST
+Nmap scan report for one.one.one.one (1.1.1.1)
+Host is up (0.15s latency).
+
+PORT   STATE    SERVICE
+1/tcp  filtered tcpmux
+2/tcp  filtered compressnet
+3/tcp  filtered compressnet
+4/tcp  filtered unknown
+5/tcp  filtered rje
+6/tcp  filtered unknown
+7/tcp  filtered echo
+8/tcp  filtered unknown
+9/tcp  filtered discard
+10/tcp filtered unknown
+
+Nmap done: 1 IP address (1 host up) scanned in 2.95 seconds
