@@ -1,8 +1,0 @@
-Starting Nmap 7.95 ( https://nmap.org ) at 2025-02-21 23:08 IST
-Nmap scan report for one.one.one.one (1.1.1.1)
-Host is up (0.045s latency).
-
-PORT   STATE    SERVICE
-23/tcp filtered telnet
-
-Nmap done: 1 IP address (1 host up) scanned in 0.70 seconds
