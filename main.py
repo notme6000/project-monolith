@@ -5,6 +5,7 @@ import time
 import os
 from threading import Thread
 from openai import OpenAI
+import shutil
 
 
 class API:
@@ -40,6 +41,7 @@ class API:
             with open(filename, 'r') as file:
                 scan_result = file.read()
                 self.result("Nmap", scan_result)
+            self.move_file(filename)
         else:
             print("scan failed")
 #NMAP PORT SCAN ENDS HERE
@@ -335,6 +337,9 @@ class API:
         self.scanprocess.terminate()
         print("terminated")
 
+    def move_file(self,source):
+        shutil.move(source, "outputfiles")
+        print("file moved")
 
 # SAVE FILE CODE STARTS HERE
    
