@@ -1,7 +1,7 @@
 
 # Project Monolith
 
-![Project Monolith](frontend/images/logo-new.png) <!-- Add a banner or representative image for the project if available -->
+![Project Monolith](frontend/images/project%20MONOLITH.png) <!-- Add a banner or representative image for the project if available -->
 
 ## Overview
 

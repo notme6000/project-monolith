@@ -6,11 +6,14 @@ import os
 from threading import Thread
 from openai import OpenAI
 import shutil
+import requests
+from bs4 import BeautifulSoup
+from urllib.parse import urljoin, urlparse
 
 
 class API:
 
-    
+#==========================================WEB-VULN TOOLS CODE STARTS HERE==========================================> 
 #NMAP PORT SCAN STARTS HERE    
     def portScan(self,ip,port,options):
         
@@ -78,7 +81,7 @@ class API:
         cmd = ["whois", domain]
         
         timestamp = datetime.datetime.now().strftime("%d-%m-%y-%H.%M.%S")
-        filename = f"{domain}-{timestamp}.txt"
+        filename = f"dnsrecon-{domain}-{timestamp}.txt"
         
         cmd_str = ' '.join(cmd) + f" > {filename}"
         print(cmd_str)
@@ -175,6 +178,66 @@ class API:
             print(f"An error occurred: {e}")
 #WEB-VULN SCAN CODE ENDS HERE
 
+
+
+#==================================================WEB-VULN TOOLS CODE ENDS HERE========================================>
+#==================================================MISC TOOLS CODE STARTS HERE==========================================>
+    def webDown(self, url, foldername):
+        def download_asset(url, folder):
+            """Download and save an asset (image, CSS, JS)"""
+            try:
+                response = requests.get(url, stream=True)
+                filename = os.path.join(folder, os.path.basename(urlparse(url).path))
+                
+                if not filename.endswith(('.jpg', '.png', '.css', '.js', '.jpeg', '.gif', '.webp')):
+                    return  # Skip non-essential files
+                
+                with open(filename, 'wb') as file:
+                    for chunk in response.iter_content(1024):
+                        file.write(chunk)
+                print(f"Downloaded: {filename}")
+            except Exception as e:
+                print(f"Failed to download {url}: {e}")
+
+        # Function to download a webpage
+        def download_website(url, save_folder=foldername):
+            """Download a website including assets using requests and BeautifulSoup"""
+            os.makedirs(save_folder, exist_ok=True)
+
+            response = requests.get(url)
+            if response.status_code != 200:
+                print(f"Failed to fetch page: {response.status_code}")
+                return
+
+            soup = BeautifulSoup(response.text, "html.parser")
+
+            # Save HTML file
+            html_path = os.path.join(save_folder, "index.html")
+            with open(html_path, "w", encoding="utf-8") as file:
+                file.write(soup.prettify())
+            print(f"Saved HTML: {html_path}")
+
+            # Download assets
+            for tag in soup.find_all(["img", "link", "script"]):
+                src = tag.get("src") or tag.get("href")
+                if src:
+                    asset_url = urljoin(url, src)
+                    download_asset(asset_url, save_folder)
+
+            print("Website download complete.")
+
+       
+        download_website(url)
+        self.move_file(foldername)
+        
+
+
+
+
+
+
+#===============================NO TOOLS CODE BELOW THIS===============================>
+# NO TOOLS CODE STARTS HERE
 #LOADER CODE STARTS HERE
     def show_loader(self):
         # Display a loader screen in a separate thread
