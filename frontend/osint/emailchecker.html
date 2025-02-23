@@ -3,10 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Web Pentesting</title>
-    <link rel="stylesheet" href="styles/style.css" />
+    <title>Port Scanning</title>
+    <link rel="stylesheet" href="../styles/style.css" />
     <script type="text/javascript" src="scripts/app.js" defer></script>
   </head>
+
   <body>
     <nav id="sidebar">
       <ul>
@@ -26,8 +27,8 @@
             </svg>
           </button>
         </li>
-        <li>
-          <a href="web-pen.html">
+        <li class="active">
+          <a href="../web-pen.html">
             <svg
               role="img"
               viewBox="0 0 24 24"
@@ -44,7 +45,7 @@
           </a>
         </li>
         <li>
-          <a href="osint.html">
+          <a href="../osint.html">
             <svg
               role="img"
               viewBox="0 0 24 24"
@@ -61,7 +62,7 @@
           </a>
         </li>
         <li>
-          <a href="encyrption.html">
+          <a href="../encyrption.html">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               height="24px"
@@ -76,8 +77,8 @@
             <span>Encryption</span>
           </a>
         </li>
-        <li class="active">
-          <a href="misc.html">
+        <li>
+          <a href="../misc.html">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               height="24px"
@@ -94,7 +95,7 @@
         </li>
         <div class="settingList">
           <li>
-            <a href="setting.html">
+            <a href="../setting.html">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 enable-background="new 0 0 24 24"
@@ -117,20 +118,56 @@
       </ul>
     </nav>
     <main>
-      <h1 style="text-align: center">Misc</h1>
-      <br />
+      <h1 style="text-align: center">Wordlist Generator</h1>
+      <p></p>
       <hr />
-      <br />
-      <div class="app-grid">
-        <a href="misc/beautisoup.html" class="app">
-          <img src="images/app-icon/soup.jpeg" alt="website downloader" />
-          <span class="app-label">website downloader</span>
-        </a>
-        <a href="misc/wordlistgen.html" class="app">
-          <img src="images/app-icon/wordlist.jpeg" alt="wordlist generator" />
-          <span class="app-label">wordlist generator</span>
-        </a>
+      <div class="form-container">
+        <h2></h2>
+        <form onsubmit="submitForm(event)">
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="text" id="email" name="email" required />
+          </div>
+
+          <button type="submit" class="submit-btn">Check email</button>
+        </form>
       </div>
     </main>
   </body>
+  <script>
+
+    function submitForm(event) {
+      event.preventDefault();
+      alert("Form submitted successfully!");
+
+      let email = document.getElementById("email").value;
+      
+
+      // let options = [];
+      // if (document.getElementById("option1").checked) {
+      //   options.push(document.getElementById("option1").value);
+      // }
+      // if (document.getElementById("option2").checked) {
+      //   options.push(document.getElementById("option2").value);
+      // }
+      // if (document.getElementById("option3").checked) {
+      //   options.push(document.getElementById("option3").value);
+      // }
+      // if (document.getElementById("option4").checked) {
+      //   options.push(document.getElementById("option4").value);
+      // }
+      // if (document.getElementById("option5").checked) {
+      //   options.push(document.getElementById("option5").value);
+      // }
+      // if (document.getElementById("option6").checked) {
+      //   options.push(document.getElementById("option6").value);
+      // }
+
+      // if (!port) {
+      //   port = "1-65535";  // default port range for full scan
+      // }
+
+      window.pywebview.api.emailchecker(email).then((response) => {});
+    }
+  </script>
 </html>

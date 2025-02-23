@@ -106,7 +106,7 @@ class API:
             with open(filename, "w") as file:
                 file.writelines(lines)
             
-            # self.save_file_ai(filename,"whois")
+            
             with open(filename, 'r') as file:
                 scan_result = file.read()
                 self.result("whois", scan_result)
@@ -181,6 +181,7 @@ class API:
 
 
 #==================================================WEB-VULN TOOLS CODE ENDS HERE========================================>
+
 #==================================================MISC TOOLS CODE STARTS HERE==========================================>
     def webDown(self, url, foldername):
         def download_asset(url, folder):
@@ -229,14 +230,89 @@ class API:
        
         download_website(url)
         self.move_file(foldername)
+     
+    def wordlistgen(self,filename,word,minlength,maxlength):
+        minstrlen = str(minlength)
+        maxstrlen = str(maxlength)
+        filename = f"{filename}.txt"
+        cmd = ["crunch",minstrlen,maxstrlen,word,"-o",filename]
         
+        cmd_str = ' '.join(cmd)
+        print(cmd_str)
+        
+        self.scanprocess = subprocess.Popen(cmd_str, shell=True)
+        self.scanprocess.wait()
+        
+        if os.path.exists(filename):
+            print(f"wordlist generated")
+            with open(filename, 'r') as file:
+                scan_result = file.read()
+                self.result("Crunch", scan_result)
+            self.move_file(filename)
+        else:
+            print("scan failed")  
+#==================================================MISC TOOLS CODE ENDS HERE============================================>
+
+#==================================================OSINT TOOLS CODE STARTS HERE==========================================>
+    def usernamesearch(self,username):
+        self.show_loader()
+        
+        cmd = ["sherlock USERNAMES", username]
+        
+        # timestamp = datetime.datetime.now().strftime("%d-%m-%y-%H.%M.%S")
+        # filename = f"username-{username}-{timestamp}.txt"
+        
+        cmd_str = ' '.join(cmd)
+        print(cmd_str)
+        
+        self.scanprocess = subprocess.Popen(cmd_str, shell=True)
+        self.scanprocess.wait()
+        
+        self.close_loader()
+        filename = f"{username}.txt"
+        if os.path.exists(filename):
+            print(f"scan for {username} is completed")
+
+            with open(filename, 'r') as file:
+                scan_result = file.read()
+                self.result("Sherlock", scan_result)
+            self.move_file(filename)
+        else:
+            print("scan failed")
+        
+    def emailchecker(self,email):
+        self.show_loader()
+        
+        cmd = ["holehe",email, "| grep +"]
+        
+        timestamp = datetime.datetime.now().strftime("%d-%m-%y-%H.%M.%S")
+        filename = f"emailchecker-{email}-{timestamp}.txt"
+        
+        cmd_str = ' '.join(cmd) + f" > {filename}"
+        print(cmd_str)
+        
+        self.scanprocess = subprocess.Popen(cmd_str, shell=True)
+        self.scanprocess.wait()
+        
+        self.close_loader()
+        
+        if os.path.exists(filename):
+            print(f"scan for {email} is completed") 
+            
+            with open(filename, 'r') as file:
+                scan_result = file.read()
+                self.result("EmailChecker", scan_result)
+            self.move_file(filename)
+        else:
+            print("scan failed")
+
+
+#==================================================OSINT TOOLS CODE ENDS HERE============================================>
 
 
 
 
-
-
-#===============================NO TOOLS CODE BELOW THIS===============================>
+#==================================================NO TOOLS CODE BELOW THIS==============================================>
 # NO TOOLS CODE STARTS HERE
 #LOADER CODE STARTS HERE
     def show_loader(self):
@@ -329,6 +405,10 @@ class API:
             tool = "DNS recon"
         elif tool == "nikto":
             tool = "web vuln scan"
+        elif tool == "sherlock":
+            tool = "username search"
+        elif tool == "Crunch":
+            tool = "wordlist generation"
         else:
             pass
         webview.create_window(tool, html=f"""
@@ -398,6 +478,7 @@ class API:
 # RESULT WINDOW POPUP CODE ENDS HERE
     def terminate_scan(self):
         self.scanprocess.terminate()
+        self.close_loader()
         print("terminated")
 
     def move_file(self,source):
