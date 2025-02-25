@@ -17,7 +17,7 @@ class API:
 #NMAP PORT SCAN STARTS HERE    
     def portScan(self,ip,port,options):
         
-        self.show_loader()
+        self.show_loader("Scanning Ports...")
         
         cmd = ["nmap", ip]
         if port:
@@ -51,6 +51,9 @@ class API:
 
 #DNS ENUMERATION CODE STARTS HERE
     def dnsEnum(self,domain,options):
+        
+        self.show_loader("Enumerating Subdomains...")
+        
         cmd = ["amass enum -d", domain]
 
         if options:
@@ -66,18 +69,24 @@ class API:
         scanprocess = subprocess.Popen(cmd_str, shell=True)
         scanprocess.wait()
         
+        self.close_loader()
+        
         if os.path.exists(filename):
             print(f"scan for {domain} is completed") 
             
             with open(filename, 'r') as file:
                 scan_result = file.read()
                 self.result("Amass", scan_result)
+            self.move_file(filename)
         else:
             print("scan failed") 
 #DNS ENUMERATION CODE ENDS HERE
 
 #DNS RECON CODE STARTS HERE
     def dnsRecon(self,domain):
+        
+        self.show_loader("Performing DNS Recon...")
+        
         cmd = ["whois", domain]
         
         timestamp = datetime.datetime.now().strftime("%d-%m-%y-%H.%M.%S")
@@ -88,6 +97,8 @@ class API:
         
         scanprocess = subprocess.Popen(cmd_str, shell=True)
         scanprocess.wait()
+        
+        self.close_loader()
         
         if os.path.exists(filename):
             print(f"scan for {domain} is completed") 
@@ -110,6 +121,7 @@ class API:
             with open(filename, 'r') as file:
                 scan_result = file.read()
                 self.result("whois", scan_result)
+            self.move_file(filename)
         else:
             print("scan failed") 
 #DNS RECON CODE ENDS HERE
@@ -150,6 +162,8 @@ class API:
 
 #WEB-VULN SCAN CODE STARTS HERE
     def webvuln(self, domain):
+        
+        self.show_loader("Scanning for Web Vulnerabilities...")
         # Construct the Nmap command
         cmd = ["nmap", "-sV", "--script=vuln", domain]
         
@@ -163,6 +177,8 @@ class API:
             with open(filename, 'w') as file:
                 self.scanprocess = subprocess.Popen(cmd, stdout=file, stderr=subprocess.PIPE)
                 self.scanprocess.wait()
+                
+                self.close_loader()
             
             # Check if the file exists and is not empty
             if os.path.exists(filename) and os.path.getsize(filename) > 0:
@@ -172,6 +188,7 @@ class API:
                 with open(filename, 'r') as file:
                     scan_result = file.read()
                     self.result("nmap", scan_result)  # Adjust the second argument as needed
+                self.move_file(filename)
             else:
                 print("Scan failed or produced no output.")
         except Exception as e:
@@ -202,6 +219,7 @@ class API:
 
         # Function to download a webpage
         def download_website(url, save_folder=foldername):
+            self.show_loader("Downloading Website...")
             """Download a website including assets using requests and BeautifulSoup"""
             os.makedirs(save_folder, exist_ok=True)
 
@@ -226,12 +244,16 @@ class API:
                     download_asset(asset_url, save_folder)
 
             print("Website download complete.")
+            self.close_loader()
 
        
         download_website(url)
         self.move_file(foldername)
      
     def wordlistgen(self,filename,word,minlength,maxlength):
+        
+        self.show_loader("Generating Wordlist...")
+        
         minstrlen = str(minlength)
         maxstrlen = str(maxlength)
         filename = f"{filename}.txt"
@@ -242,6 +264,8 @@ class API:
         
         self.scanprocess = subprocess.Popen(cmd_str, shell=True)
         self.scanprocess.wait()
+        
+        self.close_loader()
         
         if os.path.exists(filename):
             print(f"wordlist generated")
@@ -255,7 +279,7 @@ class API:
 
 #==================================================OSINT TOOLS CODE STARTS HERE==========================================>
     def usernamesearch(self,username):
-        self.show_loader()
+        self.show_loader("Searching for Usernames...")
         
         cmd = ["sherlock USERNAMES", username]
         
@@ -267,6 +291,8 @@ class API:
         
         self.scanprocess = subprocess.Popen(cmd_str, shell=True)
         self.scanprocess.wait()
+        
+        
         
         self.close_loader()
         filename = f"{username}.txt"
@@ -281,7 +307,7 @@ class API:
             print("scan failed")
         
     def emailchecker(self,email):
-        self.show_loader()
+        self.show_loader("Checking Email...")
         
         cmd = ["holehe",email, "| grep +"]
         
@@ -315,12 +341,12 @@ class API:
 #==================================================NO TOOLS CODE BELOW THIS==============================================>
 # NO TOOLS CODE STARTS HERE
 #LOADER CODE STARTS HERE
-    def show_loader(self):
+    def show_loader(self,msg):
         # Display a loader screen in a separate thread
         def loader():
             self.loader_window = webview.create_window(
                 "Loading...",
-                html="""
+                html=f"""
                 <!DOCTYPE html>
                 <html lang="en">
 
@@ -329,8 +355,8 @@ class API:
                     <meta name="viewport" content="width=device-width, initial-scale=1.0">
                     <title>Loading...</title>
                     <style>
-                        /* Overall page styles */
-                        body {
+                        
+                        body {{
                             font-family: Arial, sans-serif;
                             display: flex;
                             flex-direction: column;
@@ -340,41 +366,42 @@ class API:
                             margin: 0;
                             background-color: #1e1e1e;
                             color: #ffffff;
-                        }
+                        }}
 
-                        /* Loader animation */
-                        .loader {
+                        
+                        .loader {{
                             border: 10px solid #f3f3f3; /* Light gray border */
                             border-top: 10px solid #3498db; /* Blue border on top */
                             border-radius: 50%;
                             width: 100px;
                             height: 100px;
                             animation: spin 1s linear infinite; /* Smooth spinning */
-                        }
+                        }}
 
                         /* Spinning animation */
-                        @keyframes spin {
-                            0% {
+                        @keyframes spin {{
+                            0% {{
                                 transform: rotate(0deg);
-                            }
-                            100% {
+                            }}
+                            100% {{
                                 transform: rotate(360deg);
-                            }
-                        }
+                            }}
+                        }}
 
                         /* Text below the loader */
-                        .scan-text {
+                        .scan-text {{
                             margin-top: 20px;
                             font-size: 20px;
                             font-weight: bold;
                             text-align: center;
-                        }
+                        }}
                     </style>
                 </head>
 
                 <body>
                     <div class="loader"></div>
-                    <p class="scan-text">Scanning in progress...</p>
+                    <p class="scan-text"></p>
+                    <h1>{msg}</h1>
                 </body>
 
                 </html>
