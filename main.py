@@ -9,6 +9,7 @@ import shutil
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse
+import json
 
 
 class API:
@@ -509,11 +510,63 @@ class API:
         print("terminated")
 
     def move_file(self,source):
-        shutil.move(source, "outputfiles")
+        with open("frontend/directory_paths.json", 'r') as path_file:
+            path = json.load(path_file)
+            print(path)
+            
+        shutil.move(source, path["path"])
         print("file moved")
 
 # SAVE FILE CODE STARTS HERE
-   
+
+    def __init__(self):
+        self.selected_path = None
+        self.json_file = "frontend/directory_paths.json"
+        self.saved_paths = self.load_paths()
+
+    def load_paths(self):
+        try:
+            if os.path.exists(self.json_file):
+                with open(self.json_file, 'r') as f:
+                    return json.load(f)
+            return {"path": None}  # Store only one path
+        except json.JSONDecodeError:
+            return {"path": None}
+
+    def save_to_json(self):
+        if self.selected_path:
+            self.saved_paths["path"] = self.selected_path  # Overwrite old path
+            with open(self.json_file, 'w') as f:
+                json.dump(self.saved_paths, f, indent=4)
+            return True
+        return False
+
+    def choose_directory(self):
+        directory = webview.windows[0].create_file_dialog(
+            webview.FOLDER_DIALOG
+        )
+        
+        if directory:
+            self.selected_path = directory[0]
+            self.save_to_json()  # Save only the new path
+            self.create_a_file()
+            return self.selected_path
+        return None
+
+    def get_saved_paths(self):
+        return self.saved_paths["path"]
+    
+    def create_a_file(self):
+        if not self.selected_path:
+            return "No directory selected!"
+        
+    #     file_path = os.path.join(self.selected_path, "test.txt")
+    #     try:
+    #         with open(file_path, "w") as f:
+    #             f.write("Hello World!")
+    #         return f"File created at {file_path}"
+    #     except Exception as e:
+    #         return f"Error: {e}"
       
 # SAVE FILE CODE ENDS HERE
 
