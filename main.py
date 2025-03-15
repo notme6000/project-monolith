@@ -10,9 +10,17 @@ import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse
 import json
-
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import pad, unpad
 
 class API:
+    
+    def __init__(self):
+        self.selected_path = None
+        self.json_file = "frontend/directory_paths.json"
+        self.saved_paths = self.load_paths()
+        self.key = os.urandom(32)
+        
 
 #==========================================WEB-VULN TOOLS CODE STARTS HERE==========================================> 
 #NMAP PORT SCAN STARTS HERE    
@@ -336,8 +344,68 @@ class API:
 
 #==================================================OSINT TOOLS CODE ENDS HERE============================================>
 
+#==================================================ENCRYPTION TOOLS CODE STARTS HERE============================================>
+
+    def choose_file(self):
+        directory = webview.windows[0].create_file_dialog(
+            webview.OPEN_DIALOG
+        )
+        
+        if directory:
+            self.selected_path = directory[0]
+            self.save_to_json()  # Save only the new path
+            self.create_a_file()
+            return self.selected_path
+        return None
+
+    def get_saved_file(self):
+        return self.saved_paths["path"]
+    
+    def AESencrypt(self):
+        if not self.selected_path:
+            print("No file selected!")
+            return
+        input_file = self.selected_path
+        output_file = "encrypted_" + os.path.basename(input_file)
+        
+        iv = os.urandom(16)
+        cipher = AES.new(self.key, AES.MODE_CBC, iv)
+        
+        with open(input_file, "rb") as f:
+            plaintext = f.read()
+            
+        ciphertext = cipher.encrypt(pad(plaintext, AES.block_size))
+        
+        with open(output_file, "wb") as f:
+            f.write(iv + ciphertext)
+            
+        print(f"File encrypted and saved as {output_file}")
+    
+    def AESdecrypt(self):
+        if not self.selected_path:
+            print("No file selected!")
+            return
+        
+        encrypted_file = "encrypted_" + os.path.basename(self.selected_path)
+        decrypted_file = "decrypted_" + os.path.basename(self.selected_path)
+        
+        with open(encrypted_file, "rb") as f:
+            iv = f.read(16)
+            ciphertext = f.read()
+            
+        cipher = AES.new(self.key, AES.MODE_CBC, iv)
+        plaintext = unpad(cipher.decrypt(ciphertext), AES.block_size)
+        
+        with open(decrypted_file, "wb") as f:
+            f.write(plaintext)
+            
+        print(f"File decrypted and saved as {decrypted_file}")    
+    
+        
+        
 
 
+#==================================================ENCRYPTION TOOLS CODE ENDS HERE============================================>
 
 #==================================================NO TOOLS CODE BELOW THIS==============================================>
 # NO TOOLS CODE STARTS HERE
@@ -518,11 +586,6 @@ class API:
         print("file moved")
 
 # SAVE FILE CODE STARTS HERE
-
-    def __init__(self):
-        self.selected_path = None
-        self.json_file = "frontend/directory_paths.json"
-        self.saved_paths = self.load_paths()
 
     def load_paths(self):
         try:
