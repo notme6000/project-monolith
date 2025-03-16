@@ -85,8 +85,20 @@
       <h2></h2>
       <form onsubmit="submitForm(event)">
         <div class="form-group">
-          <label for="portIP">IP/Domain-name</label>
-          <input type="text" id="portIP" name="portIP" required>
+          <label for="portIP">Site Url</label>
+          <input type="text" id="site-url" name="site-url" required>
+        </div>
+        <div class="checkbox-group">
+            <input type="checkbox" id="option1" name="option1" value="/usr/share/wordlists/dirb/common.txt">
+            <label for="remember">Wordlist 1</label>
+        </div>
+        <div class="checkbox-group">
+            <input type="checkbox" id="option2" name="option2" value="/usr/share/wordlists/dirb/big.txt">
+            <label for="remember">Wordlist 2</label>
+        </div>
+        <div class="checkbox-group">
+            <input type="checkbox" id="option3" name="option3" value="/usr/share/wordlists/dirb/catala.txt">
+            <label for="remember">Wordlist 3</label>
         </div>
 
         <button type="submit" class="submit-btn">Scan</button>
@@ -107,34 +119,22 @@
     event.preventDefault();
     
 
-    let domain = document.getElementById("portIP").value;
-    // let port = document.getElementById("portnumber").value;
+    let siteurl = document.getElementById("site-url").value;
 
-    // let options = [];
-    // if (document.getElementById("option1").checked) {
-    //   options.push(document.getElementById("option1").value);
-    // }
-    // if (document.getElementById("option2").checked) {
-    //   options.push(document.getElementById("option2").value);
-    // }
-    // if (document.getElementById("option3").checked) {
-    //   options.push(document.getElementById("option3").value);
-    // }
-    // if (document.getElementById("option4").checked) {
-    //   options.push(document.getElementById("option4").value);
-    // }
-    // if (document.getElementById("option5").checked) {
-    //   options.push(document.getElementById("option5").value);
-    // }
-    // if (document.getElementById("option6").checked) {
-    //   options.push(document.getElementById("option6").value);
-    // }
+    let options = [];
+    if (document.getElementById("option1").checked) {
+      options.push(document.getElementById("option1").value);
+    }
+    if (document.getElementById("option2").checked) {
+      options.push(document.getElementById("option2").value);
+    }
+    if (document.getElementById("option3").checked) {
+      options.push(document.getElementById("option3").value);
+    }
 
-    // if (!port) {
-    //   port = "1-65535";  // default port range for full scan
-    // }
+    let optionstr = options.length > 0 ? options.join(",") : "/usr/share/wordlists/dirb/common.txt";
 
-    window.pywebview.api.webvuln(domain).then(response => {
+    window.pywebview.api.dirEnum(siteurl,optionstr).then(response => {
 
     });
   }

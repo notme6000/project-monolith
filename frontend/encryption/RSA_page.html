@@ -78,95 +78,152 @@
     </ul>
   </nav>
   <main>
-    <h1 style="text-align: center;">Port Scanning</h1>
-    <p></p>
+    <h1 style="text-align: center;">RSA encryption</h1>
+    <br>
     <hr>
     <div class="form-container">
-      <h2></h2>
-      <form onsubmit="submitForm(event)">
+      <form onsubmit="encryptFile(event)">
         <div class="form-group">
-          <label for="portIP">IP/Domain-name</label>
-          <input type="text" id="portIP" name="portIP" required>
+            <button type="button" class="action-button">select file</button>
+            <br>
+            <br>
+            <label for="file-name">Selected File</label>
+            <input type="text" id="file-name" name="file-name" required>
         </div>
-
-        <div class="form-group">
-          <label for="portnumber">Port number</label>
-          <input type="text" id="portnumber" name="portnumber">
-        </div>
-
-        <div class="checkbox-group">
-          <input type="checkbox" id="option1" name="option1" value="-sU">
-          <label for="remember">UDP Scan</label>
-        </div>
-        <div class="checkbox-group">
-          <input type="checkbox" id="option2" name="option2" value="-sS">
-          <label for="remember">Stealth scan</label>
-        </div>
-        <div class="checkbox-group">
-          <input type="checkbox" id="option3" name="option3" value="-O">
-          <label for="remember">OS Detection</label>
-        </div>
-        <div class="checkbox-group">
-          <input type="checkbox" id="option4" name="option4" value="-sV">
-          <label for="remember">Service Detection</label>
-        </div>
-        <div class="checkbox-group">
-          <input type="checkbox" id="option5" name="option5" value="--open">
-          <label for="remember">Open Ports Only</label>
-        </div>
-        <div class="checkbox-group">
-          <input type="checkbox" id="option6" name="option6" value="-sO">
-          <label for="remember">IP Protocol Scan</label>
-        </div>
-        
-        <button type="submit" class="submit-btn">Scan</button>
+        <button type="submit" class="submit-btn" style="width: 428px;">Encrypt File</button>
       </form>
-      <button id="terminate-scan" class="submit-btn" style="margin-top: 10px;">Terminate Scan</button>
+    </div>
+    <br>
+    <br>
+    <h1 style="text-align: center;">RSA decryption</h1>
+    <br>
+    <hr>
+    <div class="form-container">
+      <form onsubmit="decryptFile(event)">
+        <div class="form-group">
+            <button type="button" class="action-button2">select file</button>
+            <br>
+            <br>
+            <label for="file-name">Selected File</label>
+            <input type="text" id="file-name2" name="file-name2" required>
+        </div>
+        <button type="submit" class="submit-btn" style="width: 428px;">Decrypt File</button>
+      </form>
+    </div>
+    <br>
+    <br>
+    <h1 style="text-align: center;">RSA keygen</h1>
+    <br>
+    <hr>
+    <div class="form-container">
+      <form onsubmit="keyGen(event)">
+        <button type="submit" class="submit-btn" style="width: 428px;">Generate Key</button>
+      </form>
     </div>
 
   </main>
 </body>
 <script>
-  document.getElementById("terminate-scan").addEventListener("click", function() {
-      window.pywebview.api.terminate_scan();
-  });
-  
-
-  function submitForm(event) {
-    event.preventDefault();
-    alert("Form submitted successfully!");
-
-    let ip = document.getElementById("portIP").value;
-    let port = document.getElementById("portnumber").value;
-
-    let options = [];
-    if (document.getElementById("option1").checked) {
-      options.push(document.getElementById("option1").value);
-    }
-    if (document.getElementById("option2").checked) {
-      options.push(document.getElementById("option2").value);
-    }
-    if (document.getElementById("option3").checked) {
-      options.push(document.getElementById("option3").value);
-    }
-    if (document.getElementById("option4").checked) {
-      options.push(document.getElementById("option4").value);
-    }
-    if (document.getElementById("option5").checked) {
-      options.push(document.getElementById("option5").value);
-    }
-    if (document.getElementById("option6").checked) {
-      options.push(document.getElementById("option6").value);
-    }
-
-    if (!port) {
-      port = "1-65535";  // default port range for full scan
-    }
-
-    window.pywebview.api.portScan(ip, port, options).then(response => {
-
-    });
+  // Function to wait for PyWebView API to be ready
+function waitForPyWebViewAPI(callback, interval = 100) {
+  if (window.pywebview && window.pywebview.api) {
+    callback();
+  } else {
+    console.log("Waiting for PyWebView API...");
+    setTimeout(() => waitForPyWebViewAPI(callback, interval), interval);
   }
+}
+
+// Function to select a file
+function selectFile() {
+  try {
+    waitForPyWebViewAPI(async function() {
+      const path = await window.pywebview.api.choose_file();
+      if (path) {
+        document.getElementById("file-name").value = path;
+        console.log("Selected file:", path);
+      }
+    });
+  } catch (error) {
+    console.error("Error selecting file:", error);
+  }
+}
+
+function selectFile2() {
+  try {
+    waitForPyWebViewAPI(async function() {
+      const path2 = await window.pywebview.api.choose_file();
+      if (path2) {
+        document.getElementById("file-name2").value = path2;
+        console.log("Selected file:", path2);
+      }
+    });
+  } catch (error) {
+    console.error("Error selecting file:", error);
+  }
+}
+
+function encryptFile(event) {
+  event.preventDefault(); // Prevent form submission refresh
+
+  try {
+    waitForPyWebViewAPI(async function() {
+      console.log("Triggering file encryption...");
+      await window.pywebview.api.RSAencrypt();
+      alert("File encrypted successfully!");
+    });
+  } catch (error) {
+    console.error("Error encrypting file:", error);
+  }
+}
+
+function decryptFile(event) {
+  event.preventDefault(); // Prevent form submission refresh
+
+  try {
+    waitForPyWebViewAPI(async function() {
+      console.log("Triggering file encryption...");
+      await window.pywebview.api.RSAdecrypt();
+      alert("File decrypted successfully!");
+    });
+  } catch (error) {
+    console.error("Error decrypting file:", error);
+  }
+}
+
+function keyGen(event) {
+  event.preventDefault(); // Prevent form submission refresh
+
+  try {
+    waitForPyWebViewAPI(async function() {
+      console.log("Triggering file encryption...");
+      await window.pywebview.api.generate_key();
+      alert("Key generated successfully!");
+    });
+  } catch (error) {
+    console.error("Error decrypting file:", error);
+  }
+}
+
+// Add event listener to the select file button
+document.addEventListener("DOMContentLoaded", function() {
+  const selectFileButton = document.querySelector(".action-button");
+  if (selectFileButton) {
+    selectFileButton.addEventListener("click", selectFile);
+  }
+});
+
+document.addEventListener("DOMContentLoaded", function() {
+  const selectFileButton2 = document.querySelector(".action-button2");
+  if (selectFileButton2) {
+    selectFileButton2.addEventListener("click", selectFile2);
+  }
+});
+
+// Initialize when PyWebView is ready
+document.addEventListener("pywebviewready", function() {
+  console.log("PyWebView is ready!");
+});
 
 
 </script>

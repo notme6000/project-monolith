@@ -78,21 +78,37 @@
     </ul>
   </nav>
   <main>
-    <h1 style="text-align: center;">Port Scanning</h1>
-    <p></p>
+    <h1 style="text-align: center;">AES encryption</h1>
+    <br>
     <hr>
     <div class="form-container">
-      <h2></h2>
       <form onsubmit="encryptFile(event)">
         <div class="form-group">
             <button type="button" class="action-button">select file</button>
+            <br>
+            <br>
             <label for="file-name">Selected File</label>
             <input type="text" id="file-name" name="file-name" required>
         </div>
-
-        <button type="submit" class="submit-btn">Scan</button>
+        <button type="submit" class="submit-btn" style="width: 428px;">Encrypt File</button>
       </form>
-      
+    </div>
+    <br>
+    <br>
+    <h1 style="text-align: center;">AES decryption</h1>
+    <br>
+    <hr>
+    <div class="form-container">
+      <form onsubmit="decryptFile(event)">
+        <div class="form-group">
+            <button type="button" class="action-button2">select file</button>
+            <br>
+            <br>
+            <label for="file-name">Selected File</label>
+            <input type="text" id="file-name2" name="file-name2" required>
+        </div>
+        <button type="submit" class="submit-btn" style="width: 428px;">Decrypt File</button>
+      </form>
     </div>
 
   </main>
@@ -123,6 +139,20 @@ function selectFile() {
   }
 }
 
+function selectFile2() {
+  try {
+    waitForPyWebViewAPI(async function() {
+      const path2 = await window.pywebview.api.choose_file();
+      if (path2) {
+        document.getElementById("file-name2").value = path2;
+        console.log("Selected file:", path2);
+      }
+    });
+  } catch (error) {
+    console.error("Error selecting file:", error);
+  }
+}
+
 function encryptFile(event) {
   event.preventDefault(); // Prevent form submission refresh
 
@@ -137,11 +167,32 @@ function encryptFile(event) {
   }
 }
 
+function decryptFile(event) {
+  event.preventDefault(); // Prevent form submission refresh
+
+  try {
+    waitForPyWebViewAPI(async function() {
+      console.log("Triggering file encryption...");
+      await window.pywebview.api.AESdecrypt();
+      alert("File decrypted successfully!");
+    });
+  } catch (error) {
+    console.error("Error decrypting file:", error);
+  }
+}
+
 // Add event listener to the select file button
 document.addEventListener("DOMContentLoaded", function() {
   const selectFileButton = document.querySelector(".action-button");
   if (selectFileButton) {
     selectFileButton.addEventListener("click", selectFile);
+  }
+});
+
+document.addEventListener("DOMContentLoaded", function() {
+  const selectFileButton2 = document.querySelector(".action-button2");
+  if (selectFileButton2) {
+    selectFileButton2.addEventListener("click", selectFile2);
   }
 });
 

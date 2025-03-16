@@ -312,56 +312,6 @@ main p {
   background-color: #4b50d1;
 }
 
-.dropdown {
-  position: relative;
-  width: 100%;
-}
-
-.dropdown-button {
-  width: 100%;
-  padding: 0.75em;
-  border: 2px solid var(--line-clr);
-  border-radius: 0.5em;
-  background-color: var(--base-clr);
-  color: var(--text-clr);
-  font-size: 1rem;
-  cursor: pointer;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.dropdown-button:focus {
-  outline: none;
-  border-color: var(--accent-clr);
-}
-
-.dropdown-menu {
-  display: none;
-  position: absolute;
-  width: 100%;
-  background-color: var(--base-clr);
-  border: 1px solid var(--line-clr);
-  border-radius: 0.5em;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  z-index: 10;
-}
-
-.dropdown-menu.active {
-  display: block;
-}
-
-.dropdown-item {
-  padding: 0.75em;
-  color: var(--text-clr);
-  cursor: pointer;
-  transition: background 200ms ease;
-}
-
-.dropdown-item:hover {
-  background-color: var(--hover-clr);
-}
 
 .action-button {
   padding: 8px 15px;
@@ -372,7 +322,20 @@ main p {
   border-radius: 5px;
 }
 
+.action-button2 {
+  padding: 8px 15px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
 .action-button:hover {
+  background-color: #0056b3;
+}
+
+.action-button2:hover {
   background-color: #0056b3;
 }
 
