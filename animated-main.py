@@ -9,9 +9,24 @@ import shutil
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse
-
+import json
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import pad, unpad
+from cryptography.hazmat.primitives.asymmetric import rsa, padding
+from cryptography.hazmat.primitives import serialization, hashes
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+import re
 
 class API:
+    
+    def __init__(self):
+        self.selected_path = None
+        self.json_file = "frontend/directory_paths.json"
+        self.saved_paths = self.load_paths()
+        self.key = os.urandom(32)
+        
+        self.private_key_path = self.saved_paths.get("private_key_path", "private_key.pem")
+        self.public_key_path = self.saved_paths.get("public_key_path", "public_key.pem")
 
 #==========================================WEB-VULN TOOLS CODE STARTS HERE==========================================> 
 #NMAP PORT SCAN STARTS HERE    
@@ -178,6 +193,33 @@ class API:
             print(f"An error occurred: {e}")
 #WEB-VULN SCAN CODE ENDS HERE
 
+    def dirEnum(self,url,options):
+        self.show_loader("Enumerating Directories...")
+        
+        safe_url = re.sub(r"[^\w\d-]", "_", url)
+        
+        cmd = ["gobuster", "dir", "-u", url, "-w" , options]
+        
+        timestamp = datetime.datetime.now().strftime("%d-%m-%y-%H.%M.%S")
+        filename = f"direnum-{safe_url}-{timestamp}.txt"
+        
+        cmd_str = ' '.join(cmd) + f" > {filename}"
+        print(cmd_str)
+        
+        scanprocess = subprocess.Popen(cmd_str, shell=True)
+        scanprocess.wait()
+        
+        self.close_loader()
+        
+        if os.path.exists(filename):
+            print(f"scan for {url} is completed")
+            
+            with open(filename, 'r') as file:
+                scan_result = file.read()
+                self.result("Gobuster", scan_result)
+            self.move_file(filename)
+        else:
+            print("scan failed")
 
 
 #==================================================WEB-VULN TOOLS CODE ENDS HERE========================================>
@@ -308,6 +350,193 @@ class API:
 
 
 #==================================================OSINT TOOLS CODE ENDS HERE============================================>
+
+#==================================================ENCRYPTION TOOLS CODE STARTS HERE============================================>
+
+    def choose_file(self):
+        directory = webview.windows[0].create_file_dialog(
+            webview.OPEN_DIALOG
+        )
+        
+        if directory:
+            self.selected_path = directory[0]
+            return self.selected_path
+        return None
+
+    def get_saved_file(self):
+        return self.saved_paths["path"]
+    
+    def get_saved_file2(self):
+        return self.saved_paths["path2"]
+    
+#AES ENCRYPTION CODE STARTS HERE
+
+    def AESencrypt(self):
+        if not self.selected_path:
+            print("No file selected!")
+            return
+        input_file = self.selected_path
+        output_file = "AES_encrypted_" + os.path.basename(input_file)
+        
+        iv = os.urandom(16)
+        cipher = AES.new(self.key, AES.MODE_CBC, iv)
+        
+        with open(input_file, "rb") as f:
+            plaintext = f.read()
+            
+        ciphertext = cipher.encrypt(pad(plaintext, AES.block_size))
+        
+        with open(output_file, "wb") as f:
+            f.write(iv + ciphertext)
+            
+        print(f"File encrypted and saved as {output_file}")
+        self.move_file(output_file)
+    
+    def AESdecrypt(self):
+        if not self.selected_path:
+            print("No file selected!")
+            return
+
+        encrypted_file = self.selected_path
+        original_filename = os.path.basename(self.selected_path)
+        
+        if original_filename.startswith("encrypted_"):
+            original_filename = original_filename[len("encrypted_"):]
+            
+        decrypted_file = "AES_decrypted_" + original_filename
+
+        with open(encrypted_file, "rb") as f:
+            encrypted_data = f.read()
+
+        iv = encrypted_data[:16]  # First 16 bytes are IV
+        ciphertext = encrypted_data[16:]  # Rest is ciphertext
+
+        cipher = AES.new(self.key, AES.MODE_CBC, iv)
+        try:
+            plaintext = unpad(cipher.decrypt(ciphertext), AES.block_size)
+        except ValueError:
+            print("Decryption failed: Incorrect padding or corrupted data")
+            return
+
+        with open(decrypted_file, "wb") as f:
+            f.write(plaintext)
+
+        print(f"File decrypted and saved as {decrypted_file}") 
+        self.move_file(decrypted_file)
+    
+#AES ENCRYPTION CODE ENDS HERE
+
+#RSA ENCRYPTION CODE STARTS HERE
+
+    def generate_key(self):
+        private_key = rsa.generate_private_key(
+            public_exponent=65537,
+            key_size=2048
+        )
+
+        with open(self.private_key_path, "wb") as f:
+            f.write(private_key.private_bytes(
+                encoding=serialization.Encoding.PEM,
+                format=serialization.PrivateFormat.TraditionalOpenSSL,
+                encryption_algorithm=serialization.NoEncryption()
+            ))
+
+        public_key = private_key.public_key()
+        with open(self.public_key_path, "wb") as f:
+            f.write(public_key.public_bytes(
+                encoding=serialization.Encoding.PEM,
+                format=serialization.PublicFormat.SubjectPublicKeyInfo
+            ))
+        self.move_file(self.private_key_path)
+        self.move_file(self.public_key_path)
+        print("RSA keys generated and saved")
+    
+    def RSAencrypt(self):
+        
+        if not self.selected_path:
+            print("No file selected!")
+            return
+        
+        input_file = self.selected_path
+        output_file = "RSA_encrypted_" + os.path.basename(input_file)
+            
+            
+        with open(self.public_key_path, "rb") as f:
+            public_key = serialization.load_pem_public_key(f.read())
+
+        aes_key = os.urandom(32)  # 256-bit key
+        
+        encrypted_key = public_key.encrypt(
+            aes_key,
+            padding.OAEP(
+                mgf=padding.MGF1(algorithm=hashes.SHA256()),
+                algorithm=hashes.SHA256(),
+                label=None
+            )
+        )
+
+        iv = os.urandom(12)  # 96-bit IV
+        cipher = Cipher(algorithms.AES(aes_key), modes.GCM(iv))
+        encryptor = cipher.encryptor()
+
+        with open(input_file, "rb") as f:
+            plaintext = f.read()
+
+        ciphertext = encryptor.update(plaintext) + encryptor.finalize()
+
+        with open(output_file, "wb") as f:
+            f.write(encrypted_key + iv + encryptor.tag + ciphertext)
+        print(f"File encrypted and saved as {output_file}")
+
+        self.move_file(output_file)
+
+    def RSAdecrypt(self):
+        
+        if not self.selected_path:
+            print("No file selected!")
+            return
+        
+        encrypted_file = self.selected_path
+        original_filename = os.path.basename(self.selected_path)
+        
+        if original_filename.startswith("RSA_encrypted_"):
+            original_filename = original_filename[len("RSA_encrypted_"):]
+            
+        decrypted_file = "RSA_decrypted_" + original_filename
+        
+        with open(self.private_key_path, "rb") as f:
+            private_key = serialization.load_pem_private_key(f.read(), password=None)
+
+        with open(encrypted_file, "rb") as f:
+            encrypted_key = f.read(256)  # RSA 2048-bit key size
+            iv = f.read(12)  # AES-GCM IV
+            tag = f.read(16)  # AES-GCM tag
+            ciphertext = f.read()
+
+        aes_key = private_key.decrypt(
+            encrypted_key,
+            padding.OAEP(
+                mgf=padding.MGF1(algorithm=hashes.SHA256()),
+                algorithm=hashes.SHA256(),
+                label=None
+            )
+        )
+
+        cipher = Cipher(algorithms.AES(aes_key), modes.GCM(iv, tag))
+        decryptor = cipher.decryptor()
+        plaintext = decryptor.update(ciphertext) + decryptor.finalize()
+
+        with open(decrypted_file, "wb") as f:
+            f.write(plaintext)
+        
+        self.move_file(decrypted_file)
+        print(f"File decrypted and saved as {decrypted_file}")
+
+#RSA ENCRYPTION CODE ENDS HERE
+        
+
+
+#==================================================ENCRYPTION TOOLS CODE ENDS HERE============================================>
 
 
 
@@ -486,7 +715,46 @@ class API:
         print("file moved")
 
 # SAVE FILE CODE STARTS HERE
-   
+
+    def load_paths(self):
+        try:
+            if os.path.exists(self.json_file):
+                with open(self.json_file, 'r') as f:
+                    return json.load(f)
+            return {"path": None}  # Store only one path
+        except json.JSONDecodeError:
+            return {"path": None}
+
+    def save_to_json(self):
+        if self.selected_path:
+            self.saved_paths["path"] = self.selected_path  # Overwrite old path
+            self.saved_paths["private_key_path"] = f"{self.selected_path}/private_key.pem"
+            self.saved_paths["public_key_path"] = f"{self.selected_path}/public_key.pem"
+            
+            with open(self.json_file, 'w') as f:
+                json.dump(self.saved_paths, f, indent=4)
+            
+            return True
+        return False
+
+    def choose_directory(self):
+        directory = webview.windows[0].create_file_dialog(
+            webview.FOLDER_DIALOG
+        )
+        
+        if directory:
+            self.selected_path = directory[0]
+            self.save_to_json()  # Save only the new path
+            self.create_a_file()
+            return self.selected_path
+        return None
+
+    def get_saved_paths(self):
+        return self.saved_paths["path"]
+    
+    def create_a_file(self):
+        if not self.selected_path:
+            return "No directory selected!"
       
 # SAVE FILE CODE ENDS HERE
 
