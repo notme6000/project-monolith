@@ -95,6 +95,13 @@ If you prefer to install dependencies manually, follow these steps:
 ## Screenshots
 <!-- Add screenshots or images to visually represent the app -->
 
+![monolith screenshot](screenshot/OSINT.png)
+![monolith screenshot](screenshot/misc.png)
+![monolith screenshot](screenshot/encryption.png)
+![monolith screenshot](screenshot/web-pentesting.png)
+
+
+
 ## Contributing
 
 We welcome contributions from the community! To contribute:
